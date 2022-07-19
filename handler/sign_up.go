@@ -66,7 +66,6 @@ func signUp(db *sql.DB) echo.HandlerFunc {
 				err.Error(),
 			})
 		}
-
 		// 모든 처리가 끝난 후 200, Success 메시지를 반환
 		if err := c.JSON(http.StatusOK, message{
 			"Success",
