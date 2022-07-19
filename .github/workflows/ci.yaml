@@ -1,0 +1,79 @@
+name: ci
+
+on:
+  - push
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 5
+      
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/dailycahcah:squadrun
+
+  lint:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Set up Go 1.18
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
+
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 5
+
+      - name: Lint
+        uses: golangci/golangci-lint-action@v3
+  
+  deploy:
+    name: deploy
+    runs-on: [ self-hosted, label-go ]
+    needs: [lint, build]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 5
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Docker run
+        run: |
+          docker stop go_cicd && docker rm go_cicd && docker rmi solone313/dailycahcah:squadrun
+          docker image pull solone313/dailycahcah:squadrun
+          docker run -d -e DBUSER='${{ secrets.DBUSER }}' \
+            -e DBPASS='${{ secrets.DBPASS }}' \
+            -e DBNAME='${{ secrets.DBNAME }}' \
+            -e DBHOST='${{ secrets.DBHOST }}' \
+            -e SECRET_KEY='${{ secrets.SECRET_KEY }}' \
+            -e APPLE_TEAM_ID='${{ secrets.APPLE_TEAM_ID }}' \
+            -e APPLE_CLIENT_ID='${{ secrets.APPLE_CLIENT_ID }}' \
+            -e APPLE_KEY_ID='${{ secrets.APPLE_KEY_ID }}' \
+            -p 80:1323 \
+            --name go_cicd \
+            --restart always solone313/dailycahcah:squadrun

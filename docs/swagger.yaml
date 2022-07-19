@@ -1,0 +1,125 @@
+basePath: /api
+definitions:
+  handler.AppleSignInRequest:
+    properties:
+      token:
+        type: string
+    type: object
+  handler.SignInResponse:
+    properties:
+      access_token:
+        type: string
+      expired_at:
+        type: string
+    type: object
+  handler.SignInUserRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  handler.message:
+    properties:
+      message:
+        type: string
+    type: object
+host: ec2-15-164-164-58.ap-northeast-2.compute.amazonaws.com
+info:
+  contact: {}
+  title: SquadRun Sample Swagger API
+  version: "1.0"
+paths:
+  /apple-sign-in:
+    post:
+      consumes:
+      - application/json
+      description: Token을 받아 access token을 반환합니다.
+      parameters:
+      - description: 애플로그인 token
+        in: body
+        name: token
+        required: true
+        schema:
+          $ref: '#/definitions/handler.AppleSignInRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.SignInResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.message'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.message'
+      summary: 애플 로그인 API
+  /sign-in:
+    post:
+      consumes:
+      - application/json
+      description: email, password를 받아 access token을 반환합니다.
+      parameters:
+      - description: 유저 정보
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.SignInUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.SignInResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.message'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.message'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.message'
+      summary: 로그인 API
+  /sign-up:
+    post:
+      consumes:
+      - application/json
+      description: email, password를 받아 가입합니다.
+      parameters:
+      - description: 유저 정보
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.SignInUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.message'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.message'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.message'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.message'
+      summary: 회원가입 API
+swagger: "2.0"
