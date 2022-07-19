@@ -71,9 +71,6 @@ jobs:
             -e DBNAME='${{ secrets.DBNAME }}' \
             -e DBHOST='${{ secrets.DBHOST }}' \
             -e SECRET_KEY='${{ secrets.SECRET_KEY }}' \
-            -e APPLE_TEAM_ID='${{ secrets.APPLE_TEAM_ID }}' \
-            -e APPLE_CLIENT_ID='${{ secrets.APPLE_CLIENT_ID }}' \
-            -e APPLE_KEY_ID='${{ secrets.APPLE_KEY_ID }}' \
             -p 80:1323 \
             --name go_cicd \
             --restart always solone313/dailycahcah:squadrun
